@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+/* =========================================================
+   PPGCC UFOP — Design tokens
+   Editorial SAAS · warm neutrals · burgundy accent
+   Migrado do protótipo (tokens.css) para Next.js
+   ========================================================= */
+
+:root {
+  /* ---- type ---- */
+  --font-sans: var(--font-geist), "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-serif: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
+
+  /* ---- density (overridden by [data-density]) ---- */
+  --d-card-pad: 20px;
+  --d-row-h: 44px;
+  --d-gap: 16px;
+
+  /* ---- radii ---- */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+
+  /* ---- transitions ---- */
+  --t-fast: 120ms cubic-bezier(.2, .8, .2, 1);
+  --t-mid: 220ms cubic-bezier(.2, .8, .2, 1);
+}
+
+/* ===== LIGHT (default) — warm paper ===== */
+:root,
+[data-theme="light"] {
+  --bg: oklch(0.985 0.004 70);
+  --bg-2: oklch(0.965 0.006 70);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.975 0.005 70);
+  --surface-hi: oklch(0.99 0.003 70);
+  --inset: oklch(0.945 0.008 70);
+  --border: oklch(0.91 0.008 70);
+  --border-strong: oklch(0.84 0.01 70);
+  --divider: oklch(0.93 0.006 70);
+
+  --fg: oklch(0.21 0.012 60);
+  --fg-2: oklch(0.34 0.012 60);
+  --muted: oklch(0.52 0.012 60);
+  --muted-2: oklch(0.66 0.01 60);
+  --faint: oklch(0.78 0.008 60);
+
+  --accent: oklch(0.43 0.13 22);
+  --accent-fg: oklch(0.99 0.003 70);
+  --accent-soft: oklch(0.93 0.04 22);
+  --accent-soft-fg: oklch(0.38 0.13 22);
+  --accent-line: oklch(0.86 0.06 22);
+
+  --ok: oklch(0.55 0.11 155);
+  --ok-soft: oklch(0.94 0.04 155);
+  --warn: oklch(0.66 0.13 70);
+  --warn-soft: oklch(0.95 0.06 70);
+  --danger: oklch(0.55 0.18 25);
+  --danger-soft: oklch(0.95 0.05 25);
+  --info: oklch(0.55 0.11 245);
+  --info-soft: oklch(0.94 0.04 245);
+
+  --shadow-sm: 0 1px 2px rgba(40, 30, 25, 0.04), 0 1px 0 rgba(40, 30, 25, 0.02);
+  --shadow-md: 0 1px 2px rgba(40, 30, 25, 0.05), 0 8px 24px -8px rgba(40, 30, 25, 0.08);
+  --shadow-lg: 0 1px 2px rgba(40, 30, 25, 0.05), 0 24px 60px -20px rgba(40, 30, 25, 0.18);
+
+  --grid-line: oklch(0.91 0.006 70);
+  color-scheme: light;
+}
+
+/* ===== DARK — warm charcoal ===== */
+[data-theme="dark"] {
+  --bg: oklch(0.155 0.006 60);
+  --bg-2: oklch(0.135 0.006 60);
+  --surface: oklch(0.195 0.008 60);
+  --surface-2: oklch(0.22 0.008 60);
+  --surface-hi: oklch(0.235 0.009 60);
+  --inset: oklch(0.18 0.007 60);
+  --border: oklch(0.27 0.01 60);
+  --border-strong: oklch(0.34 0.012 60);
+  --divider: oklch(0.24 0.009 60);
+
+  --fg: oklch(0.97 0.005 70);
+  --fg-2: oklch(0.88 0.006 70);
+  --muted: oklch(0.66 0.01 70);
+  --muted-2: oklch(0.52 0.012 70);
+  --faint: oklch(0.4 0.012 70);
+
+  --accent: oklch(0.66 0.16 22);
+  --accent-fg: oklch(0.13 0.01 60);
+  --accent-soft: oklch(0.32 0.09 22);
+  --accent-soft-fg: oklch(0.84 0.13 22);
+  --accent-line: oklch(0.4 0.11 22);
+
+  --ok: oklch(0.72 0.15 155);
+  --ok-soft: oklch(0.28 0.07 155);
+  --warn: oklch(0.78 0.15 75);
+  --warn-soft: oklch(0.3 0.08 75);
+  --danger: oklch(0.7 0.18 25);
+  --danger-soft: oklch(0.3 0.1 25);
+  --info: oklch(0.72 0.13 245);
+  --info-soft: oklch(0.28 0.07 245);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.02);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.4), 0 12px 40px -8px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.5), 0 32px 80px -16px rgba(0, 0, 0, 0.7);
+
+  --grid-line: oklch(0.27 0.008 60);
+  color-scheme: dark;
+}
+
+/* ===== Density modes ===== */
+[data-density="compact"] {
+  --d-card-pad: 14px;
+  --d-row-h: 36px;
+  --d-gap: 10px;
+}
+
+[data-density="comfortable"] {
+  --d-card-pad: 20px;
+  --d-row-h: 44px;
+  --d-gap: 16px;
+}
+
+[data-density="spacious"] {
+  --d-card-pad: 28px;
+  --d-row-h: 56px;
+  --d-gap: 22px;
+}
+
+/* ===== Reset / base ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* hide scrollbars on horizontal scrollers */
+.nice-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.nice-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.nice-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ===== Utility classes ===== */
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "ss01", "zero", "tnum";
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--inset);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  box-shadow: 0 1px 0 var(--border);
+}
+
+/* ===== Animations ===== */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fade-in var(--t-mid) both;
+}

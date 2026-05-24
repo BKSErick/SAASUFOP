@@ -1,0 +1,45 @@
+﻿# Dependencies
+node_modules
+
+# Next.js
+.next
+out
+
+# Vercel
+.vercel
+
+# Env (NUNCA comitar)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# TS / Build
+*.tsbuildinfo
+next-env.d.ts
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode
+.idea
+
+# Prototype backup (manter local, não comitar)
+_prototype
+
+# Arquivos originais do protótipo na raiz (órfãos — app real está em src/;
+# preservados em _prototype/). Não comitar no repo de produção.
+/app.jsx
+/shell.jsx
+/charts.jsx
+/icons.jsx
+/tweaks-panel.jsx
+/page-dashboard.jsx
+/page-alunos.jsx
+/page-others.jsx
+/data.js
+/tokens.css
+/index.html
+/.thumbnail
