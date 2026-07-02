@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Pill, Avatar, Btn, Section, type PillTone } from "@/components/ui/primitives";
 import { Donut, HBars } from "@/components/charts";
@@ -35,6 +35,12 @@ export interface DashboardViewProps {
 
 const PALETTE = ["var(--accent)", "var(--info)", "var(--warn)", "var(--ok)"];
 
+type SraImportState =
+  | { status: "idle"; message: string }
+  | { status: "loading"; message: string }
+  | { status: "success"; message: string }
+  | { status: "error"; message: string };
+
 interface KpiProps {
   label: string;
   value: ReactNode;
@@ -68,6 +74,8 @@ function EmptyState({ icon, title, hint }: { icon: ReactNode; title: string; hin
 
 export function DashboardView(props: DashboardViewProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [sraImport, setSraImport] = useState<SraImportState>({ status: "idle", message: "" });
   const {
     totalAlunos, totalBolsas, totalA1A2, bancasAgendadas, proximasDefesas,
     alertaVencidoCount, alertaPertoCount, bolsasPorAgencia, topDocentes,
@@ -77,6 +85,50 @@ export function DashboardView(props: DashboardViewProps) {
   const cobertura = totalAlunos > 0 ? Math.round((totalBolsas / totalAlunos) * 100) : 0;
   const bolsasDonut = Object.entries(bolsasPorAgencia).map(([k, v], i) => ({ label: k, value: v, color: PALETTE[i % PALETTE.length] }));
   const sevColor = (s: AlertRow["severity"]) => (s === "danger" ? "var(--danger)" : s === "warn" ? "var(--warn)" : "var(--info)");
+
+  async function handleSraFile(file: File | undefined) {
+    if (!file) return;
+    setSraImport({ status: "loading", message: `Importando ${file.name}...` });
+
+    const form = new FormData();
+    form.append("file", file);
+
+    try {
+      const response = await fetch("/api/sra/import", { method: "POST", body: form });
+      const payload = await response.json().catch(() => null) as {
+        imported?: number;
+        matchedOrientadores?: number;
+        unmatchedOrientadores?: number;
+        missingPrazo?: number;
+        error?: string;
+        details?: string;
+      } | null;
+
+      if (!response.ok) {
+        throw new Error(payload?.details || payload?.error || "Falha ao importar SRA");
+      }
+
+      const imported = payload?.imported ?? 0;
+      const matched = payload?.matchedOrientadores ?? 0;
+      const unmatched = payload?.unmatchedOrientadores ?? 0;
+      const missingPrazo = payload?.missingPrazo ?? 0;
+      const extras = [
+        `${matched} orientadores vinculados`,
+        unmatched > 0 ? `${unmatched} sem vinculo` : null,
+        missingPrazo > 0 ? `${missingPrazo} sem prazo` : null,
+      ].filter(Boolean).join("; ");
+
+      setSraImport({ status: "success", message: `${imported} alunos importados. ${extras}.` });
+      router.refresh();
+    } catch (error) {
+      setSraImport({
+        status: "error",
+        message: error instanceof Error ? error.message : "Falha ao importar SRA",
+      });
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 1480, margin: "0 auto" }}>
@@ -95,9 +147,44 @@ export function DashboardView(props: DashboardViewProps) {
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <Btn variant="secondary" size="sm" icon={Ico.mail({ size: 13 })} disabled title="Envio por SMTP removido do escopo">Enviar alertas</Btn>
-          <Btn variant="primary" size="sm" icon={Ico.upload({ size: 13 })} onClick={() => router.push("/dashboard/integracoes")}>Importar SRA</Btn>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xls,.xlsx,.csv"
+            style={{ display: "none" }}
+            onChange={(event) => void handleSraFile(event.target.files?.[0])}
+          />
+          <Btn
+            variant="primary"
+            size="sm"
+            icon={Ico.upload({ size: 13 })}
+            disabled={sraImport.status === "loading"}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {sraImport.status === "loading" ? "Importando..." : "Importar SRA"}
+          </Btn>
         </div>
       </div>
+
+      {sraImport.status !== "idle" && (
+        <div
+          role="status"
+          style={{
+            marginTop: -8,
+            padding: "10px 12px",
+            borderRadius: 8,
+            border: "1px solid",
+            borderColor: sraImport.status === "error" ? "var(--danger)" : "var(--border)",
+            background: sraImport.status === "error"
+              ? "color-mix(in oklch, var(--danger) 8%, transparent)"
+              : "var(--surface)",
+            color: sraImport.status === "error" ? "var(--danger)" : "var(--fg-2)",
+            fontSize: 12,
+          }}
+        >
+          {sraImport.message}
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--d-gap)" }}>
         <KPI label="Alunos ativos" value={totalAlunos} sub={`${totalBolsas} com bolsa - ${cobertura}% cobertura`} />
