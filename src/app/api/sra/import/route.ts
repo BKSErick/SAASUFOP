@@ -85,7 +85,7 @@ async function upsertDefesaBancas(rows: ReturnType<typeof parseSraSpreadsheet>["
       continue;
     }
 
-    const dataHora = `${row.data_defesa}T00:00:00`;
+    const dataHora = `${row.data_defesa}T12:00:00`;
     const { data: existing, error: findError } = await supabaseAdmin
       .from("bancas")
       .select("id")

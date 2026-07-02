@@ -45,6 +45,10 @@ export default async function DashboardPage() {
   ].slice(0, 8);
 
   const topDocentes = [...docentes].sort((a, b) => b.orientandos - a.orientandos).slice(0, 6);
+  const proximasBancas = bancas
+    .filter((b) => new Date(b.data) >= HOJE)
+    .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    .slice(0, 3);
 
   return (
     <DashboardView
@@ -57,7 +61,7 @@ export default async function DashboardPage() {
       alertaPertoCount={kpis.alertaPerto.length}
       bolsasPorAgencia={kpis.bolsasPorAgencia}
       topDocentes={topDocentes}
-      proximasBancas={bancas.slice(0, 3)}
+      proximasBancas={proximasBancas}
       alerts={alerts}
     />
   );

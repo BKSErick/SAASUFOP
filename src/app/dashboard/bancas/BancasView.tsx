@@ -48,6 +48,10 @@ export function BancasView({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [openForm, setOpenForm] = useState(false);
   const [state, setState] = useState<ImportState>({ status: "idle", message: "" });
+  const [visibleMonth, setVisibleMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+  const [periodFilter, setPeriodFilter] = useState<"all" | "future" | "past" | "month">("future");
+  const [typeFilter, setTypeFilter] = useState<"all" | "Defesa" | "Qualificação">("all");
+  const [query, setQuery] = useState("");
   const [form, setForm] = useState({
     matricula: "",
     alunoNome: "",
@@ -58,13 +62,30 @@ export function BancasView({
     linkTransmissao: "",
   });
 
-  const calendarYear = today.getFullYear();
-  const calendarMonth = today.getMonth();
+  const calendarYear = visibleMonth.getFullYear();
+  const calendarMonth = visibleMonth.getMonth();
   const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
   const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+  const calendarCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
   const dayToday = today.getDate();
-  const monthLabel = today.toLocaleString("pt-BR", { month: "long", year: "numeric" });
+  const monthLabel = visibleMonth.toLocaleString("pt-BR", { month: "long", year: "numeric" });
   const bancasByDay: Record<number, Banca[]> = {};
+  const monthStart = new Date(calendarYear, calendarMonth, 1);
+  const monthEnd = new Date(calendarYear, calendarMonth + 1, 0, 23, 59, 59);
+  const filteredBancas = bancas
+    .filter((b) => {
+      const date = new Date(b.data);
+      if (typeFilter !== "all" && b.tipo !== typeFilter) return false;
+      if (periodFilter === "future" && date < today) return false;
+      if (periodFilter === "past" && date >= today) return false;
+      if (periodFilter === "month" && (date < monthStart || date > monthEnd)) return false;
+      if (query.trim()) {
+        const haystack = `${b.aluno} ${b.titulo} ${b.local}`.toLowerCase();
+        if (!haystack.includes(query.trim().toLowerCase())) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
 
   bancas.forEach((b) => {
     const d = new Date(b.data);
@@ -73,6 +94,14 @@ export function BancasView({
       (bancasByDay[day] = bancasByDay[day] || []).push(b);
     }
   });
+
+  function moveMonth(delta: number) {
+    setVisibleMonth((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
+  }
+
+  function hasExplicitTime(date: Date) {
+    return !(date.getHours() === 12 && date.getMinutes() === 0);
+  }
 
   async function upload(file: File) {
     setState({ status: "loading", message: `Importando ${file.name}...` });
@@ -186,24 +215,24 @@ export function BancasView({
         </Card>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "var(--d-gap)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr minmax(340px, 390px)", gap: "var(--d-gap)", alignItems: "start" }}>
         <Card padding={0}>
           <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--divider)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600, textTransform: "capitalize" }}>{monthLabel}</h3>
             <div style={{ display: "flex", gap: 4 }}>
-              <Btn variant="ghost" size="sm" style={{ padding: 6 }} disabled title="Navegacao de calendario pendente"><span style={{ display: "inline-flex", transform: "rotate(180deg)" }}>{Ico.chevron({ size: 14 })}</span></Btn>
-              <Btn variant="ghost" size="sm" disabled title="Navegacao de calendario pendente">Hoje</Btn>
-              <Btn variant="ghost" size="sm" style={{ padding: 6 }} disabled title="Navegacao de calendario pendente">{Ico.chevron({ size: 14 })}</Btn>
+              <Btn variant="ghost" size="sm" style={{ padding: 6 }} onClick={() => moveMonth(-1)} title="Mes anterior"><span style={{ display: "inline-flex", transform: "rotate(180deg)" }}>{Ico.chevron({ size: 14 })}</span></Btn>
+              <Btn variant="ghost" size="sm" onClick={() => setVisibleMonth(new Date(today.getFullYear(), today.getMonth(), 1))}>Hoje</Btn>
+              <Btn variant="ghost" size="sm" style={{ padding: 6 }} onClick={() => moveMonth(1)} title="Proximo mes">{Ico.chevron({ size: 14 })}</Btn>
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 0 }}>
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"].map((d, i) => (
               <div key={i} style={{ padding: "8px 10px", fontSize: 10.5, color: "var(--muted)", letterSpacing: "0.05em", textTransform: "uppercase", borderBottom: "1px solid var(--divider)" }}>{d}</div>
             ))}
-            {Array.from({ length: 35 }).map((_, i) => {
+            {Array.from({ length: calendarCells }).map((_, i) => {
               const day = i - firstDay + 1;
               const valid = day >= 1 && day <= daysInMonth;
-              const isToday = day === dayToday;
+              const isToday = day === dayToday && calendarMonth === today.getMonth() && calendarYear === today.getFullYear();
               const events = bancasByDay[day] || [];
               return (
                 <div key={i} style={{ minHeight: 96, padding: 8, borderRight: i % 7 !== 6 ? "1px solid var(--divider)" : "none", borderBottom: "1px solid var(--divider)", opacity: valid ? 1 : 0.3, background: isToday ? "color-mix(in oklch, var(--accent) 5%, var(--surface))" : "transparent", position: "relative" }}>
@@ -223,16 +252,34 @@ export function BancasView({
           </div>
         </Card>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ fontSize: 11, color: "var(--muted)", letterSpacing: "0.05em", textTransform: "uppercase", fontWeight: 500 }}>Proximas</div>
-          {bancas.length === 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, maxHeight: "calc(100vh - 150px)", position: "sticky", top: 88 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <div style={{ fontSize: 11, color: "var(--muted)", letterSpacing: "0.05em", textTransform: "uppercase", fontWeight: 500 }}>Bancas</div>
+            <span className="mono tabular" style={{ fontSize: 11, color: "var(--muted)" }}>{filteredBancas.length}/{bancas.length}</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <select value={periodFilter} onChange={(event) => setPeriodFilter(event.target.value as typeof periodFilter)} style={inputStyle}>
+              <option value="all">Todas as datas</option>
+              <option value="future">Futuras</option>
+              <option value="past">Passadas</option>
+              <option value="month">Mes visivel</option>
+            </select>
+            <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as typeof typeFilter)} style={inputStyle}>
+              <option value="all">Todos os tipos</option>
+              <option value="Defesa">Defesas</option>
+              <option value="Qualificação">Qualificacoes</option>
+            </select>
+          </div>
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filtrar aluno, titulo, local..." style={inputStyle} />
+          {filteredBancas.length === 0 && (
             <Card style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "32px 16px", textAlign: "center", color: "var(--muted)" }}>
               <span style={{ color: "var(--muted-2)" }}>{Ico.calendar({ size: 24 })}</span>
-              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--fg-2)" }}>Nenhuma banca agendada</div>
-              <div style={{ fontSize: 11.5 }}>Cadastre manualmente ou importe a planilha do formulario de defesas.</div>
+              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--fg-2)" }}>Nenhuma banca encontrada</div>
+              <div style={{ fontSize: 11.5 }}>Ajuste os filtros ou importe a planilha SRA/formulario de defesas.</div>
             </Card>
           )}
-          {bancas.map((b) => {
+          <div className="nice-scroll" style={{ display: "flex", flexDirection: "column", gap: 12, overflowY: "auto", paddingRight: 4 }}>
+          {filteredBancas.map((b) => {
             const dt = new Date(b.data);
             return (
               <Card key={b.id} style={{ display: "flex", gap: 12, padding: "14px 16px" }}>
@@ -243,7 +290,7 @@ export function BancasView({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                     <Pill tone={b.tipo === "Defesa" ? "accent" : "info"} style={{ fontSize: 9.5 }}>{b.tipo}</Pill>
-                    <span style={{ fontSize: 11, color: "var(--muted)" }}>{dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>
+                    {hasExplicitTime(dt) && <span style={{ fontSize: 11, color: "var(--muted)" }}>{dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>}
                   </div>
                   <div style={{ fontSize: 12.5, fontWeight: 500, marginTop: 4, lineHeight: 1.3 }}>{b.aluno}</div>
                   <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{b.local || "-"}</div>
@@ -251,6 +298,7 @@ export function BancasView({
               </Card>
             );
           })}
+          </div>
         </div>
       </div>
     </div>

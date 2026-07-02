@@ -74,14 +74,15 @@ async function rowsFromRequest(request: Request): Promise<BancaImportRow[]> {
 }
 
 async function upsertBanca(row: BancaImportRow, alunoId: string | null) {
-  let existingQuery = supabaseAdmin
+  const baseQuery = supabaseAdmin
     .from("bancas")
     .select("id")
     .eq("tipo", row.tipo)
-    .eq("data_hora", row.data_hora)
     .limit(1);
 
-  existingQuery = alunoId ? existingQuery.eq("aluno_id", alunoId) : existingQuery.is("aluno_id", null);
+  const existingQuery = alunoId
+    ? baseQuery.eq("aluno_id", alunoId)
+    : baseQuery.is("aluno_id", null).eq("data_hora", row.data_hora);
 
   const { data: existing, error: findError } = await existingQuery.maybeSingle<{ id: string }>();
 

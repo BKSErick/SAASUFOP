@@ -43,7 +43,7 @@ function parseDate(value: unknown): string | null {
   const brDateTime = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:\s+(\d{1,2}):(\d{2}))?/);
   if (brDateTime) {
     const year = brDateTime[3].length === 2 ? `20${brDateTime[3]}` : brDateTime[3];
-    const hour = brDateTime[4]?.padStart(2, "0") ?? "00";
+    const hour = brDateTime[4]?.padStart(2, "0") ?? "12";
     const minute = brDateTime[5] ?? "00";
     return `${year}-${brDateTime[2].padStart(2, "0")}-${brDateTime[1].padStart(2, "0")}T${hour}:${minute}:00`;
   }
