@@ -3,10 +3,10 @@
    Indicadores reais consolidados de producoes/docentes.
    ========================================================= */
 import type { ReactNode } from "react";
-import { Card, Btn, Pill } from "@/components/ui/primitives";
-import { Ico } from "@/components/icons";
+import { Card, Pill } from "@/components/ui/primitives";
 import { Donut, HBars } from "@/components/charts";
 import { getQualityCapesMetrics } from "@/lib/data";
+import { ScopusVerifyButton } from "./ScopusVerifyButton";
 
 const PALETTE = ["var(--accent)", "var(--info)", "var(--warn)", "var(--ok)", "var(--danger)", "var(--muted)"];
 const QUALIS_ORDER = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C"];
@@ -45,7 +45,7 @@ export default async function QualidadePage() {
             Quadrienio 2025-2028 - dados vindos das planilhas docentes, XML Lattes e crosswalk QUALIS/JCR.
           </p>
         </div>
-        <Btn variant="secondary" size="sm" icon={Ico.refresh({ size: 13 })} disabled title="O crosswalk roda apos importacao das planilhas docentes">Atualizar crosswalk</Btn>
+        <ScopusVerifyButton />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--d-gap)", marginBottom: 16 }}>

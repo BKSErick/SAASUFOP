@@ -100,6 +100,7 @@ export function DashboardView(props: DashboardViewProps) {
         matchedOrientadores?: number;
         unmatchedOrientadores?: number;
         missingPrazo?: number;
+        bancas?: { inserted?: number; updated?: number; skipped?: number };
         error?: string;
         details?: string;
       } | null;
@@ -112,8 +113,11 @@ export function DashboardView(props: DashboardViewProps) {
       const matched = payload?.matchedOrientadores ?? 0;
       const unmatched = payload?.unmatchedOrientadores ?? 0;
       const missingPrazo = payload?.missingPrazo ?? 0;
+      const bancas = payload?.bancas;
+      const bancasCount = (bancas?.inserted ?? 0) + (bancas?.updated ?? 0);
       const extras = [
         `${matched} orientadores vinculados`,
+        bancas ? `${bancasCount} bancas de defesa sincronizadas` : null,
         unmatched > 0 ? `${unmatched} sem vinculo` : null,
         missingPrazo > 0 ? `${missingPrazo} sem prazo` : null,
       ].filter(Boolean).join("; ");

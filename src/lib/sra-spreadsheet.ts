@@ -8,6 +8,7 @@ export type SraStudentRow = {
   status_bolsa: string;
   status: string;
   prazo_jubilamento: string | null;
+  data_defesa: string | null;
   nivel: "Mestrado" | "Doutorado";
   creditos: number;
   avatar_hue: number;
@@ -181,7 +182,7 @@ export function parseSraSpreadsheet(buffer: Buffer, fileName = "sra.xlsx"): SraP
       const nome = stringOrNull(get(row, col.nome)) ?? `Aluno ${matricula}`;
       const dataIngresso = parseDateCell(get(row, col.dataIngresso));
       const nivel = mapNivel(get(row, col.nivel));
-      const prazoImportado = parseDateCell(get(row, col.dataDefesa));
+      const dataDefesa = parseDateCell(get(row, col.dataDefesa));
       const prazoCalculado = addMonths(dataIngresso, nivel === "Doutorado" ? 48 : 30);
 
       return {
@@ -194,7 +195,8 @@ export function parseSraSpreadsheet(buffer: Buffer, fileName = "sra.xlsx"): SraP
         data_ingresso: dataIngresso,
         status_bolsa: mapBolsa(get(row, col.bolsa), get(row, col.bolsaDesc)),
         status: mapStatus(get(row, situacaoDescricao), get(row, col.dataDefesa), get(row, col.exameQualificacao)),
-        prazo_jubilamento: prazoImportado ?? prazoCalculado,
+        prazo_jubilamento: dataDefesa ?? prazoCalculado,
+        data_defesa: dataDefesa,
         nivel,
         creditos: parseInteger(get(row, col.creditos)),
         avatar_hue: hueFrom(nome),

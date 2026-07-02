@@ -10,6 +10,12 @@ type ProfessorLookup = {
   nome: string;
 };
 
+type AlunoLookup = {
+  id: string;
+  nome: string;
+  matricula: string;
+};
+
 function matchProfessorId(orientadorNome: string | null, professores: ProfessorLookup[]) {
   if (!orientadorNome) return null;
   const target = normalizeSraName(orientadorNome);
@@ -52,6 +58,66 @@ async function refreshProfessorCounts() {
 
     if (error) throw error;
   }
+}
+
+async function upsertDefesaBancas(rows: ReturnType<typeof parseSraSpreadsheet>["rows"]) {
+  const defesaRows = rows.filter((row) => row.data_defesa);
+  if (defesaRows.length === 0) return { inserted: 0, updated: 0, skipped: 0 };
+
+  const matriculas = defesaRows.map((row) => row.matricula);
+  const { data: alunos, error: alunosError } = await supabaseAdmin
+    .from("alunos")
+    .select("id, nome, matricula")
+    .in("matricula", matriculas)
+    .returns<AlunoLookup[]>();
+
+  if (alunosError) throw alunosError;
+
+  const alunoByMatricula = new Map((alunos ?? []).map((aluno) => [aluno.matricula, aluno]));
+  let inserted = 0;
+  let updated = 0;
+  let skipped = 0;
+
+  for (const row of defesaRows) {
+    const aluno = alunoByMatricula.get(row.matricula);
+    if (!aluno || !row.data_defesa) {
+      skipped += 1;
+      continue;
+    }
+
+    const dataHora = `${row.data_defesa}T00:00:00`;
+    const { data: existing, error: findError } = await supabaseAdmin
+      .from("bancas")
+      .select("id")
+      .eq("aluno_id", aluno.id)
+      .eq("tipo", "Defesa")
+      .limit(1)
+      .maybeSingle<{ id: string }>();
+
+    if (findError) throw findError;
+
+    const payload = {
+      aluno_id: aluno.id,
+      titulo_trabalho: `Defesa - ${aluno.nome}`,
+      tipo: "Defesa",
+      data_hora: dataHora,
+      local: null,
+      link_transmissao: null,
+      status_publicacao_site: false,
+    };
+
+    if (existing?.id) {
+      const { error } = await supabaseAdmin.from("bancas").update(payload).eq("id", existing.id);
+      if (error) throw error;
+      updated += 1;
+    } else {
+      const { error } = await supabaseAdmin.from("bancas").insert(payload);
+      if (error) throw error;
+      inserted += 1;
+    }
+  }
+
+  return { inserted, updated, skipped };
 }
 
 export async function POST(request: Request) {
@@ -111,10 +177,12 @@ export async function POST(request: Request) {
     if (upsertError) throw upsertError;
 
     await refreshProfessorCounts();
+    const bancas = await upsertDefesaBancas(parsed.rows);
 
     return NextResponse.json({
       imported: payload.length,
       totalRows: parsed.totalRows,
+      bancas,
       matchedOrientadores,
       unmatchedOrientadores: unmatchedOrientadores.size,
       unmatchedOrientadorSamples: Array.from(unmatchedOrientadores).slice(0, 10),
