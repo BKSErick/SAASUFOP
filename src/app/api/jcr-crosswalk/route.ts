@@ -17,11 +17,11 @@ export async function POST(req: Request) {
 
         if (action === 'import') {
             if (!csv || typeof csv !== 'string') {
-                return NextResponse.json({ error: 'Campo csv Ã© obrigatÃ³rio para action=import' }, { status: 400 })
+                return NextResponse.json({ error: 'Campo csv obrigatorio para action=import' }, { status: 400 })
             }
             const journals = parseJCRcsv(csv)
             if (journals.length === 0) {
-                return NextResponse.json({ error: 'Nenhum journal vÃ¡lido encontrado no CSV' }, { status: 422 })
+                return NextResponse.json({ error: 'Nenhum journal valido encontrado no CSV' }, { status: 422 })
             }
             importResult = await importJournalList(journals)
         }

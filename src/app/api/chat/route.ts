@@ -2,10 +2,10 @@
 import { requireApiAuth } from '@/lib/api-auth'
 import { logWarn } from '@/lib/logger'
 
-const SYSTEM_PROMPT = `VocÃª Ã© o Orion, assistente da plataforma UFOP (Universidade Federal de Ouro Preto).
-Responda em portuguÃªs brasileiro de forma clara e objetiva.
-Ajude professores e alunos com dÃºvidas sobre a plataforma, organizaÃ§Ã£o acadÃªmica e informaÃ§Ãµes gerais da universidade.
-Seja cordial, profissional e conciso. MÃ¡ximo 200 palavras por resposta.`
+const SYSTEM_PROMPT = `Voce e o Orion, assistente da plataforma UFOP (Universidade Federal de Ouro Preto).
+Responda em portugues brasileiro de forma clara e objetiva.
+Ajude professores e alunos com duvidas sobre a plataforma, organizacao academica e informacoes gerais da universidade.
+Seja cordial, profissional e conciso. Maximo 200 palavras por resposta.`
 
 async function callGemini(messages: { role: string; content: string }[]): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY
@@ -83,6 +83,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ reply })
   } catch {
-    return NextResponse.json({ error: 'ServiÃ§o temporariamente indisponÃ­vel.' }, { status: 500 })
+    return NextResponse.json({ error: 'Servico temporariamente indisponivel.' }, { status: 500 })
   }
 }

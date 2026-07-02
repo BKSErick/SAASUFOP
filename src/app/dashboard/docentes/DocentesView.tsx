@@ -7,6 +7,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Pill, Avatar, Btn } from "@/components/ui/primitives";
 import { Ico } from "@/components/icons";
+import { HBars } from "@/components/charts";
 import type { Docente } from "@/types/domain";
 
 function Stat({ label, value, sub }: { label: string; value: ReactNode; sub?: string }) {
@@ -36,36 +37,40 @@ interface ImportState {
   message: string;
 }
 
-function QualitySpreadsheetButton({ docenteId, onResult }: { docenteId: string; onResult: (state: ImportState) => void }) {
+function CurriculumImportButton({ docenteId, onResult }: { docenteId: string; onResult: (state: ImportState) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   async function upload(file: File) {
     setLoading(true);
-    onResult({ id: docenteId, status: "loading", message: "Importando planilha de curriculo..." });
+    const isXml = file.name.toLowerCase().endsWith(".xml");
+    onResult({ id: docenteId, status: "loading", message: isXml ? "Importando XML Lattes..." : "Importando planilha de curriculo..." });
 
     const body = new FormData();
     body.append("professorId", docenteId);
     body.append("file", file);
 
     try {
-      const res = await fetch("/api/quality/import", { method: "POST", body });
+      const res = await fetch(isXml ? "/api/lattes/import" : "/api/quality/import", { method: "POST", body });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.details || data?.error || "Falha na importacao");
 
       const summary = data.summary ?? {};
+      const imported = data.imported ?? {};
       onResult({
         id: docenteId,
         status: "ok",
-        message: `${data.imported ?? 0} producoes importadas; ${summary.missingQualis ?? 0} sem Qualis`,
+        message: isXml
+          ? `${imported.artigos ?? 0} artigos, ${imported.projetos ?? 0} projetos, ${imported.orientacoes ?? 0} orientacoes`
+          : `${data.imported ?? 0} producoes importadas; ${summary.missingQualis ?? 0} sem Qualis`,
       });
       router.refresh();
     } catch (error) {
       onResult({
         id: docenteId,
         status: "error",
-        message: error instanceof Error ? error.message : "Falha ao importar planilha de curriculo",
+        message: error instanceof Error ? error.message : "Falha ao importar arquivo de curriculo",
       });
     } finally {
       setLoading(false);
@@ -78,7 +83,7 @@ function QualitySpreadsheetButton({ docenteId, onResult }: { docenteId: string; 
       <input
         ref={inputRef}
         type="file"
-        accept=".xlsx,.xls,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        accept=".xlsx,.xls,.csv,.xml,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         style={{ display: "none" }}
         onChange={(event) => {
           const file = event.target.files?.[0];
@@ -91,9 +96,9 @@ function QualitySpreadsheetButton({ docenteId, onResult }: { docenteId: string; 
         icon={Ico.upload({ size: 12 })}
         onClick={() => inputRef.current?.click()}
         disabled={loading}
-        title="Subir planilha de curriculo do docente"
+        title="Subir planilha de curriculo ou XML Lattes do docente"
       >
-        {loading ? "Importando" : "Subir planilha"}
+        {loading ? "Importando" : "Subir arquivo"}
       </Btn>
     </>
   );
@@ -129,8 +134,13 @@ export function DocentesView({ docentes }: { docentes: Docente[] }) {
             <strong className="mono" style={{ color: "var(--fg)" }}>{docentes.length}</strong> docentes
             (media {docentes.length ? (totalOrientandos / docentes.length).toFixed(1) : "0"} por docente).
           </p>
+          {sorted.length > 0 && (
+            <div style={{ marginTop: 8 }}>
+              <HBars data={sorted.slice(0, 8).map((d) => ({ label: d.nome, value: d.orientandos }))} />
+            </div>
+          )}
           <p style={{ margin: "4px 0 0", fontSize: 11.5, color: "var(--muted-2)" }}>
-            Cada professor deve anexar sua planilha de curriculo. O importador extrai publicacoes, ISSN, DOI, QUALIS, JCR/Scopus quando existirem na planilha; o que faltar fica marcado para crosswalk externo.
+            Cada professor deve anexar a planilha de curriculo para metricas de qualidade. XML Lattes tambem pode ser importado para publicacoes, projetos e orientacoes; QUALIS/JCR/Scopus entram pela planilha ou por crosswalk externo.
           </p>
         </Card>
         <Card>
@@ -143,7 +153,7 @@ export function DocentesView({ docentes }: { docentes: Docente[] }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "var(--d-gap)" }}>
         {sorted.map((d) => {
-          const lastImport = d.lattes ? new Date(d.lattes).toLocaleDateString("pt-BR") : "Sem planilha";
+          const lastImport = d.lattes ? new Date(d.lattes).toLocaleDateString("pt-BR") : "Sem arquivo";
           return (
             <Card key={d.id} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -160,8 +170,8 @@ export function DocentesView({ docentes }: { docentes: Docente[] }) {
                 <MiniStat label="Prod." value={d.producao > 0 ? d.producao : "-"} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, borderTop: "1px solid var(--divider)", paddingTop: 10 }}>
-                <span style={{ fontSize: 11, color: "var(--muted)" }}>Planilha: {lastImport}</span>
-                <QualitySpreadsheetButton docenteId={d.id} onResult={setImportState} />
+                <span style={{ fontSize: 11, color: "var(--muted)" }}>Arquivo: {lastImport}</span>
+                <CurriculumImportButton docenteId={d.id} onResult={setImportState} />
               </div>
             </Card>
           );

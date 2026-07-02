@@ -1,6 +1,3 @@
-/* =========================================================
-   Disciplinas (server) â€” port de page-others.jsx::Disciplinas
-   ========================================================= */
 import { Card, Btn } from "@/components/ui/primitives";
 import { Ico } from "@/components/icons";
 import { getDisciplinas } from "@/lib/data";
@@ -15,21 +12,23 @@ export default async function DisciplinasPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 18 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 500, letterSpacing: "-0.02em", fontFamily: "var(--font-serif)" }}>Disciplinas</h1>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--muted)" }}>{disciplinas.length} ofertadas Â· 2026/1</p>
+          <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--muted)" }}>{disciplinas.length} ofertadas - fonte real Supabase</p>
         </div>
-        <Btn variant="primary" size="sm" icon={Ico.plus({ size: 13 })} disabled title="Cadastro de disciplinas pendente">Nova disciplina</Btn>
+        <Btn variant="primary" size="sm" icon={Ico.plus({ size: 13 })} disabled title="Importacao semestral de disciplinas pendente">Nova disciplina</Btn>
       </div>
       <Card padding={0}>
         {disciplinas.length === 0 && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "48px 24px", textAlign: "center", color: "var(--muted)" }}>
             <span style={{ color: "var(--muted-2)" }}>{Ico.book({ size: 28 })}</span>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--fg-2)" }}>Nenhuma disciplina cadastrada</div>
-            <div style={{ fontSize: 12, maxWidth: 380 }}>As disciplinas ofertadas serÃ£o cadastradas pela coordenaÃ§Ã£o â€” mÃ³dulo pendente.</div>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--fg-2)" }}>Nenhuma disciplina no banco real</div>
+            <div style={{ fontSize: 12, maxWidth: 460 }}>
+              A tabela `disciplinas` existe, mas esta vazia no Supabase. A fonte prevista nas reunioes e o formulario/planilha semestral de disciplinas lecionadas por professor.
+            </div>
           </div>
         )}
         {disciplinas.length > 0 && (
           <div style={{ display: "grid", gridTemplateColumns: COLS, padding: "10px 16px", borderBottom: "1px solid var(--divider)", fontSize: 11, color: "var(--muted)", letterSpacing: "0.04em", textTransform: "uppercase", fontWeight: 500 }}>
-            <span>CÃ³digo</span><span>Disciplina</span><span>Professor</span><span>PerÃ­odo</span><span>CrÃ©d.</span><span style={{ textAlign: "right" }}>MatrÃ­cul.</span>
+            <span>Codigo</span><span>Disciplina</span><span>Professor</span><span>Periodo</span><span>Cred.</span><span style={{ textAlign: "right" }}>Matricul.</span>
           </div>
         )}
         {disciplinas.map((d, i) => (

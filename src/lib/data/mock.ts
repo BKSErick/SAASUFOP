@@ -16,26 +16,19 @@ import type {
 } from "@/types/domain";
 
 export const LINHAS = [
-  "Bancos de Dados & IA",
+  "IA aplicada",
+  "Sistemas Distribuidos",
+  "Visao Computacional",
   "Engenharia de Software",
-  "Sistemas DistribuÃƒÂ­dos",
-  "VisÃƒÂ£o Computacional",
-  "OtimizaÃƒÂ§ÃƒÂ£o & Teoria",
-] as const;
+  "Otimizacao e Teoria",
+];
 
 export const DOCENTES: Docente[] = [
-  { id: "d01", nome: "Ana L. Tavares", titulo: "Profa. Dra.", linha: 0, orientandos: 6, h: 18, capes: "1A", lattes: "2025-04-12", producao: 12 },
-  { id: "d02", nome: "Bruno SÃƒÂ¡ Carvalho", titulo: "Prof. Dr.", linha: 1, orientandos: 5, h: 14, capes: "1B", lattes: "2025-03-28", producao: 8 },
-  { id: "d03", nome: "Carla Mendes Reis", titulo: "Profa. Dra.", linha: 2, orientandos: 4, h: 22, capes: "1A", lattes: "2025-04-30", producao: 15 },
-  { id: "d04", nome: "Diego F. Oliveira", titulo: "Prof. Dr.", linha: 0, orientandos: 7, h: 11, capes: "2", lattes: "2025-02-04", producao: 6 },
-  { id: "d05", nome: "Eduarda V. Pinheiro", titulo: "Profa. Dra.", linha: 3, orientandos: 3, h: 19, capes: "1B", lattes: "2025-05-02", producao: 9 },
-  { id: "d06", nome: "Felipe AragÃƒÂ£o", titulo: "Prof. Dr.", linha: 4, orientandos: 2, h: 9, capes: "2", lattes: "2024-12-18", producao: 4 },
-  { id: "d07", nome: "Gabriela Nunes", titulo: "Profa. Dra.", linha: 1, orientandos: 5, h: 16, capes: "1B", lattes: "2025-04-05", producao: 10 },
-  { id: "d08", nome: "Henrique L. Costa", titulo: "Prof. Dr.", linha: 2, orientandos: 6, h: 24, capes: "1A", lattes: "2025-04-22", producao: 14 },
-  { id: "d09", nome: "Isabela R. Furtado", titulo: "Profa. Dra.", linha: 3, orientandos: 4, h: 13, capes: "1B", lattes: "2025-03-11", producao: 7 },
-  { id: "d10", nome: "JoÃƒÂ£o V. Marcondes", titulo: "Prof. Dr.", linha: 0, orientandos: 5, h: 17, capes: "1A", lattes: "2025-04-18", producao: 11 },
-  { id: "d11", nome: "Karina B. Saldanha", titulo: "Profa. Dra.", linha: 4, orientandos: 3, h: 12, capes: "2", lattes: "2025-01-09", producao: 5 },
-  { id: "d12", nome: "Luiz OtÃƒÂ¡vio Resende", titulo: "Prof. Dr.", linha: 1, orientandos: 4, h: 20, capes: "1A", lattes: "2025-04-27", producao: 13 },
+  { id: "d01", nome: "Docente Referencia 1", titulo: "Prof. Dr.", linha: 0, orientandos: 6, h: 0, capes: "", lattes: "", producao: 0 },
+  { id: "d02", nome: "Docente Referencia 2", titulo: "Prof. Dr.", linha: 1, orientandos: 5, h: 0, capes: "", lattes: "", producao: 0 },
+  { id: "d03", nome: "Docente Referencia 3", titulo: "Prof. Dr.", linha: 2, orientandos: 4, h: 0, capes: "", lattes: "", producao: 0 },
+  { id: "d04", nome: "Docente Referencia 4", titulo: "Prof. Dr.", linha: 3, orientandos: 4, h: 0, capes: "", lattes: "", producao: 0 },
+  { id: "d05", nome: "Docente Referencia 5", titulo: "Prof. Dr.", linha: 4, orientandos: 3, h: 0, capes: "", lattes: "", producao: 0 },
 ];
 
 const NOMES_ALUNOS = [
@@ -53,7 +46,7 @@ const NOMES_ALUNOS = [
 
 const BOLSAS_AG = ["CAPES", "CNPq", "FAPEMIG", "PROPP"];
 const NIVEIS: Nivel[] = ["Mestrado", "Mestrado", "Mestrado", "Doutorado", "Doutorado"];
-const STATUS: StatusAluno[] = ["Cursando", "Cursando", "Cursando", "Qualificado", "Defesa marcada", "Aguard. documentação"];
+const STATUS: StatusAluno[] = ["Cursando", "Cursando", "Cursando", "Qualificado", "Defesa marcada", "Aguard. documentacao"];
 
 function pick<T>(arr: readonly T[], i: number): T {
   return arr[i % arr.length];
@@ -141,7 +134,7 @@ export const PROD_SERIES: ProdSeriesPoint[] = [
  * ou ÃƒÂ­ndice fora do range. As linhas reais do PPGEP virÃƒÂ£o de fonte futura.
  */
 export function linhaLabel(linha: number): string {
-  return linha >= 0 && linha < LINHAS.length ? LINHAS[linha] : "Ã¢â‚¬â€";
+  return linha >= 0 && linha < LINHAS.length ? LINHAS[linha] : "-";
 }
 
 function startOfToday(): Date {

@@ -11,7 +11,7 @@ export type StatusAluno =
   | "Cursando"
   | "Qualificado"
   | "Defesa marcada"
-  | "Aguard. documentação";
+  | "Aguard. documentacao";
 
 export type CapesRating = "1A" | "1B" | "2";
 

@@ -1,6 +1,3 @@
-/* =========================================================
-   Dashboard (server) — fetch via data layer + computa alertas
-   ========================================================= */
 import { DashboardView, type AlertRow } from "./DashboardView";
 import { getDashboardKpis, getDocentes, getBancas, HOJE, mesesEntre } from "@/lib/data";
 
@@ -13,19 +10,37 @@ export default async function DashboardPage() {
 
   const alerts: AlertRow[] = [
     ...kpis.alertaVencido.map((a) => ({
-      id: a.id, nome: a.nome, nivel: a.nivel, orientador: a.orientador, avatar_hue: a.avatar_hue,
-      prazo_jubilamento: a.prazo_jubilamento, severity: "danger" as const,
-      meses: -mesesEntre(HOJE, new Date(a.prazo_jubilamento)), reason: "Prazo excedido",
+      id: a.id,
+      nome: a.nome,
+      nivel: a.nivel,
+      orientador: a.orientador,
+      avatar_hue: a.avatar_hue,
+      prazo_jubilamento: a.prazo_jubilamento,
+      severity: "danger" as const,
+      meses: -mesesEntre(HOJE, new Date(a.prazo_jubilamento)),
+      reason: "Prazo excedido",
     })),
     ...kpis.alertaPerto.slice(0, 6).map((a) => ({
-      id: a.id, nome: a.nome, nivel: a.nivel, orientador: a.orientador, avatar_hue: a.avatar_hue,
-      prazo_jubilamento: a.prazo_jubilamento, severity: "warn" as const,
-      meses: mesesEntre(HOJE, new Date(a.prazo_jubilamento)), reason: "Próx. do jubilamento",
+      id: a.id,
+      nome: a.nome,
+      nivel: a.nivel,
+      orientador: a.orientador,
+      avatar_hue: a.avatar_hue,
+      prazo_jubilamento: a.prazo_jubilamento,
+      severity: "warn" as const,
+      meses: mesesEntre(HOJE, new Date(a.prazo_jubilamento)),
+      reason: "Proximo do jubilamento",
     })),
     ...kpis.aguardandoDoc.slice(0, 3).map((a) => ({
-      id: a.id, nome: a.nome, nivel: a.nivel, orientador: a.orientador, avatar_hue: a.avatar_hue,
-      prazo_jubilamento: a.prazo_jubilamento, severity: "info" as const,
-      meses: null, reason: "Aguard. documentação",
+      id: a.id,
+      nome: a.nome,
+      nivel: a.nivel,
+      orientador: a.orientador,
+      avatar_hue: a.avatar_hue,
+      prazo_jubilamento: a.prazo_jubilamento,
+      severity: "info" as const,
+      meses: null,
+      reason: "Aguardando documentacao",
     })),
   ].slice(0, 8);
 

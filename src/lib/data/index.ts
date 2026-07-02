@@ -88,6 +88,14 @@ interface DisciplinaRow {
   professores: { nome: string } | null;
 }
 
+function normalizeStatus(value: string | null): StatusAluno {
+  const text = (value ?? "Cursando").toLowerCase();
+  if (text.includes("aguard")) return "Aguard. documentacao";
+  if (text.includes("defesa")) return "Defesa marcada";
+  if (text.includes("qualific")) return "Qualificado";
+  return "Cursando";
+}
+
 // ----- Mappers DB → domain -----
 function mapDocente(r: ProfRow): Docente {
   return {
@@ -112,8 +120,8 @@ function mapAluno(r: AlunoRow): Aluno {
     ingresso: r.data_ingresso ?? "",
     prazo_jubilamento: r.prazo_jubilamento ?? "",
     status_bolsa: r.status_bolsa ?? "Nenhuma",
-    status: (r.status ?? "Cursando") as StatusAluno,
-    orientador: r.professores?.nome ?? "—",
+    status: normalizeStatus(r.status),
+    orientador: r.professores?.nome ?? "-",
     orientador_id: r.professor_orientador_id ?? "",
     linha: r.linha_pesquisa_id ?? -1, // -1 = sem linha registrada
     producoes: r.producoes_count,
@@ -136,11 +144,11 @@ function mapProducao(r: ProducaoRow): Producao {
 function mapBanca(r: BancaRow): Banca {
   return {
     id: r.id,
-    aluno: r.alunos?.nome ?? "—",
+    aluno: r.alunos?.nome ?? "-",
     tipo: (r.tipo ?? "Defesa") as TipoBanca,
     titulo: r.titulo_trabalho,
     data: r.data_hora ?? "",
-    presidente: r.alunos?.professores?.nome ?? "—",
+    presidente: r.alunos?.professores?.nome ?? "-",
     local: r.local ?? "",
   };
 }
@@ -151,7 +159,7 @@ function mapDisciplina(r: DisciplinaRow): Disciplina {
     codigo: r.codigo,
     nome: r.nome,
     creditos: r.creditos,
-    professor: r.professores?.nome ?? "—",
+    professor: r.professores?.nome ?? "-",
     periodo: r.periodo ?? "",
     matriculados: r.matriculados,
   };

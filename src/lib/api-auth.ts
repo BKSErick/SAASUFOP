@@ -69,6 +69,10 @@ export async function requireApiAuth(
     return { ok: false, response: unauthorized() };
   }
 
+  if (!options.roles) {
+    return { ok: true, role: "docente", userId: user.id, internal: false };
+  }
+
   const { data: profile, error: profileError } = await supabase
     .from("perfis")
     .select("role")
@@ -76,13 +80,7 @@ export async function requireApiAuth(
     .maybeSingle<{ role: UserRole | null }>();
 
   if (profileError) {
-    return {
-      ok: false,
-      response: NextResponse.json(
-        { error: "Falha ao validar permissoes" },
-        { status: 500 },
-      ),
-    };
+    return { ok: false, response: forbidden("Perfil administrativo nao configurado para este usuario") };
   }
 
   const role = profile?.role ?? "docente";

@@ -77,8 +77,8 @@ export function Topbar({ breadcrumb, title, actions, theme, onToggleTheme, onOpe
         }}
       >
         {Ico.search({ size: 14 })}
-        <span style={{ flex: 1, textAlign: "left" }}>Buscar aluno, docente, bancaâ€¦</span>
-        <span className="kbd">âŒ˜K</span>
+        <span style={{ flex: 1, textAlign: "left" }}>Buscar aluno, docente, banca...</span>
+        <span className="kbd">Ctrl K</span>
       </button>
 
       {/* Bell */}

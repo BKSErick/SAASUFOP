@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { ADMIN_ROLES, requireApiAuth } from '@/lib/api-auth'
+import { requireApiAuth } from '@/lib/api-auth'
 import { parseLattesXML } from '@/lib/lattes-xml-parser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { logError } from '@/lib/logger'
@@ -17,8 +17,16 @@ function cleanText(value: unknown): string | null {
     return text.length > 0 ? text : null
 }
 
+function decodeXml(buffer: ArrayBuffer): string {
+    const bytes = Buffer.from(buffer)
+    const head = bytes.subarray(0, 300).toString('ascii').toLowerCase()
+    const encoding = head.match(/encoding=["']([^"']+)["']/)?.[1] ?? 'utf-8'
+    const decoder = new TextDecoder(encoding.includes('iso-8859-1') ? 'iso-8859-1' : 'utf-8')
+    return decoder.decode(bytes)
+}
+
 export async function POST(request: Request) {
-    const auth = await requireApiAuth(request, { roles: ADMIN_ROLES })
+    const auth = await requireApiAuth(request)
     if (!auth.ok) return auth.response
 
     try {
@@ -38,7 +46,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Arquivo XML excede 12 MB' }, { status: 413 })
         }
 
-        const xml = await file.text()
+        const xml = decodeXml(await file.arrayBuffer())
         const parsed = await parseLattesXML(xml)
 
         const { data: professor, error: professorError } = await supabaseAdmin
