@@ -1,9 +1,9 @@
 "use client";
 
 /* =========================================================
-   DashboardView — Painel PPGEP (Engenharia de Produção)
+   DashboardView Ã¢â‚¬â€ Painel PPGEP (Engenharia de ProduÃƒÂ§ÃƒÂ£o)
    Dados reais: alunos, bolsas, alertas de jubilamento, carga
-   de orientação. Produção/bancas (Lattes/Forms) pendentes →
+   de orientaÃƒÂ§ÃƒÂ£o. ProduÃƒÂ§ÃƒÂ£o/bancas (Lattes/Forms) pendentes Ã¢â€ â€™
    empty states honestos. Sem dados fabricados.
    ========================================================= */
 import type { ReactNode } from "react";
@@ -90,28 +90,28 @@ export function DashboardView(props: DashboardViewProps) {
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div>
           <p style={{ margin: 0, fontSize: 12, color: "var(--muted)", letterSpacing: "0.04em", textTransform: "uppercase", fontWeight: 500 }}>
-            Coordenação PPGEP · Eng. Produção · UFOP
+            CoordenaÃƒÂ§ÃƒÂ£o PPGEP Ã‚Â· Eng. ProduÃƒÂ§ÃƒÂ£o Ã‚Â· UFOP
           </p>
           <h1 style={{ margin: "6px 0 0", fontSize: 30, fontWeight: 500, letterSpacing: "-0.025em", fontFamily: "var(--font-serif)" }}>
-            Painel de gestão acadêmica
+            Painel de gestÃƒÂ£o acadÃƒÂªmica
           </h1>
           <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--muted)", maxWidth: 540 }}>
             <strong style={{ color: "var(--danger)", fontWeight: 500 }}>{alertaVencidoCount} alunos</strong> com prazo excedido
-            e <strong style={{ color: "var(--warn)", fontWeight: 500 }}>{alertaPertoCount}</strong> próximos do jubilamento exigem atenção.
+            e <strong style={{ color: "var(--warn)", fontWeight: 500 }}>{alertaPertoCount}</strong> prÃƒÂ³ximos do jubilamento exigem atenÃƒÂ§ÃƒÂ£o.
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <Btn variant="secondary" size="sm" icon={Ico.mail({ size: 13 })}>Enviar alertas</Btn>
+          <Btn variant="secondary" size="sm" icon={Ico.mail({ size: 13 })} disabled title="Envio por SMTP removido do escopo">Enviar alertas</Btn>
           <Btn variant="primary" size="sm" icon={Ico.upload({ size: 13 })} onClick={() => router.push("/dashboard/integracoes")}>Importar SRA</Btn>
         </div>
       </div>
 
-      {/* KPI row — valores reais */}
+      {/* KPI row Ã¢â‚¬â€ valores reais */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--d-gap)" }}>
-        <KPI label="Alunos ativos" value={totalAlunos} sub={`${totalBolsas} com bolsa · ${cobertura}% cobertura`} />
-        <KPI label="Produção QUALIS A1/A2" value={totalA1A2} sub="Integração Lattes pendente" accent="var(--info)" />
-        <KPI label="Bancas agendadas" value={bancasAgendadas} sub={`${proximasDefesas} defesas · próximos 6 meses`} accent="var(--warn)" />
-        <KPI label="Alertas críticos" value={String(alertaVencidoCount + alertaPertoCount).padStart(2, "0")} sub={`${alertaVencidoCount} vencidos · ${alertaPertoCount} em alerta`} accent="var(--danger)" tag={{ text: "Ação", tone: "danger" }} />
+        <KPI label="Alunos ativos" value={totalAlunos} sub={`${totalBolsas} com bolsa Ã‚Â· ${cobertura}% cobertura`} />
+        <KPI label="ProduÃƒÂ§ÃƒÂ£o QUALIS A1/A2" value={totalA1A2} sub="Planilhas docentes + crosswalk" accent="var(--info)" />
+        <KPI label="Bancas agendadas" value={bancasAgendadas} sub={`${proximasDefesas} defesas Ã‚Â· prÃƒÂ³ximos 6 meses`} accent="var(--warn)" />
+        <KPI label="Alertas crÃƒÂ­ticos" value={String(alertaVencidoCount + alertaPertoCount).padStart(2, "0")} sub={`${alertaVencidoCount} vencidos Ã‚Â· ${alertaPertoCount} em alerta`} accent="var(--danger)" tag={{ text: "AÃƒÂ§ÃƒÂ£o", tone: "danger" }} />
       </div>
 
       {/* Main grid */}
@@ -120,13 +120,13 @@ export function DashboardView(props: DashboardViewProps) {
           <div style={{ padding: "16px 20px 14px", borderBottom: "1px solid var(--divider)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Linha do tempo de prazos</h3>
-              <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--muted)" }}>Alunos ordenados por urgência de jubilamento</p>
+              <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--muted)" }}>Alunos ordenados por urgÃƒÂªncia de jubilamento</p>
             </div>
-            <Btn variant="ghost" size="sm" onClick={() => router.push("/dashboard/alunos")}>Ver todos →</Btn>
+            <Btn variant="ghost" size="sm" onClick={() => router.push("/dashboard/alunos")}>Ver todos Ã¢â€ â€™</Btn>
           </div>
           <div style={{ padding: "6px 8px 12px" }}>
             {alerts.length === 0 && (
-              <EmptyState icon={Ico.check({ size: 22 })} title="Nenhum alerta de prazo" hint="Nenhum aluno com prazo excedido ou próximo do jubilamento nos próximos 6 meses." />
+              <EmptyState icon={Ico.check({ size: 22 })} title="Nenhum alerta de prazo" hint="Nenhum aluno com prazo excedido ou prÃƒÂ³ximo do jubilamento nos prÃƒÂ³ximos 6 meses." />
             )}
             {alerts.map((a, i) => (
               <button
@@ -139,7 +139,7 @@ export function DashboardView(props: DashboardViewProps) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 500 }}>{a.nome}</span>
-                    <span style={{ fontSize: 11, color: "var(--muted)" }}>· {a.nivel} · {a.orientador}</span>
+                    <span style={{ fontSize: 11, color: "var(--muted)" }}>Ã‚Â· {a.nivel} Ã‚Â· {a.orientador}</span>
                   </div>
                   <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2 }}>{a.reason}</div>
                 </div>
@@ -162,7 +162,7 @@ export function DashboardView(props: DashboardViewProps) {
           <Card>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Bolsas por agência</h3>
+                <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Bolsas por agÃƒÂªncia</h3>
                 <p style={{ margin: "2px 0 0", fontSize: 11.5, color: "var(--muted)" }}>{totalBolsas} ativas</p>
               </div>
             </div>
@@ -188,16 +188,16 @@ export function DashboardView(props: DashboardViewProps) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--d-gap)" }}>
         <Card>
           <div style={{ marginBottom: 12 }}>
-            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Produção qualificada</h3>
-            <p style={{ margin: "2px 0 0", fontSize: 11.5, color: "var(--muted)" }}>Extrato QUALIS por mês</p>
+            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>ProduÃƒÂ§ÃƒÂ£o qualificada</h3>
+            <p style={{ margin: "2px 0 0", fontSize: 11.5, color: "var(--muted)" }}>Extrato QUALIS por mÃƒÂªs</p>
           </div>
-          <EmptyState icon={Ico.file({ size: 22 })} title="Sem produções registradas" hint="As produções acadêmicas serão preenchidas pela integração com o Currículo Lattes — pendente." />
+          <EmptyState icon={Ico.file({ size: 22 })} title="Sem produÃƒÂ§ÃƒÂµes registradas" hint="As producoes academicas serao preenchidas pelas planilhas de curriculo anexadas por docente." />
         </Card>
 
         <Card>
           <div style={{ marginBottom: 14 }}>
-            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Carga de orientação</h3>
-            <p style={{ margin: "2px 0 0", fontSize: 11.5, color: "var(--muted)" }}>Top docentes · orientandos ativos</p>
+            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Carga de orientaÃƒÂ§ÃƒÂ£o</h3>
+            <p style={{ margin: "2px 0 0", fontSize: 11.5, color: "var(--muted)" }}>Top docentes Ã‚Â· orientandos ativos</p>
           </div>
           {topDocentes.length > 0 ? (
             <HBars data={topDocentes.map((d) => ({ label: d.nome, value: d.orientandos }))} />
@@ -207,8 +207,8 @@ export function DashboardView(props: DashboardViewProps) {
         </Card>
       </div>
 
-      {/* Próximas bancas */}
-      <Section title="Próximas bancas" hint="Defesas e qualificações agendadas" action={<Btn variant="ghost" size="sm" onClick={() => router.push("/dashboard/bancas")}>Abrir calendário →</Btn>}>
+      {/* PrÃƒÂ³ximas bancas */}
+      <Section title="PrÃƒÂ³ximas bancas" hint="Defesas e qualificaÃƒÂ§ÃƒÂµes agendadas" action={<Btn variant="ghost" size="sm" onClick={() => router.push("/dashboard/bancas")}>Abrir calendÃƒÂ¡rio Ã¢â€ â€™</Btn>}>
         {proximasBancas.length > 0 ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--d-gap)" }}>
             {proximasBancas.map((b) => {
@@ -226,7 +226,7 @@ export function DashboardView(props: DashboardViewProps) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <Pill tone={b.tipo === "Defesa" ? "accent" : "info"}>{b.tipo}</Pill>
                     <h4 style={{ margin: "8px 0 4px", fontSize: 13, fontWeight: 500, lineHeight: 1.35 }}>{b.titulo}</h4>
-                    <p style={{ margin: 0, fontSize: 11.5, color: "var(--muted)" }}>{b.aluno} · {b.local}</p>
+                    <p style={{ margin: 0, fontSize: 11.5, color: "var(--muted)" }}>{b.aluno} Ã‚Â· {b.local}</p>
                   </div>
                 </Card>
               );
@@ -234,7 +234,7 @@ export function DashboardView(props: DashboardViewProps) {
           </div>
         ) : (
           <Card>
-            <EmptyState icon={Ico.calendar({ size: 22 })} title="Nenhuma banca agendada" hint="As bancas marcadas aparecerão aqui (substituindo os Google Forms) — módulo pendente." />
+            <EmptyState icon={Ico.calendar({ size: 22 })} title="Nenhuma banca agendada" hint="As bancas marcadas aparecerÃƒÂ£o aqui (substituindo os Google Forms) Ã¢â‚¬â€ mÃƒÂ³dulo pendente." />
           </Card>
         )}
       </Section>

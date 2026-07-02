@@ -1,7 +1,7 @@
 "use client";
 
 /* =========================================================
-   Topbar — port de _prototype/shell.jsx
+   Topbar â€” port de _prototype/shell.jsx
    ========================================================= */
 import type { ReactNode } from "react";
 import { Ico } from "@/components/icons";
@@ -77,12 +77,12 @@ export function Topbar({ breadcrumb, title, actions, theme, onToggleTheme, onOpe
         }}
       >
         {Ico.search({ size: 14 })}
-        <span style={{ flex: 1, textAlign: "left" }}>Buscar aluno, docente, banca…</span>
-        <span className="kbd">⌘K</span>
+        <span style={{ flex: 1, textAlign: "left" }}>Buscar aluno, docente, bancaâ€¦</span>
+        <span className="kbd">âŒ˜K</span>
       </button>
 
       {/* Bell */}
-      <button style={{ position: "relative", padding: 8, borderRadius: 8, background: "transparent", border: "1px solid transparent", color: "var(--fg-2)" }}>
+      <button disabled title="Notificacoes pendentes" style={{ position: "relative", padding: 8, borderRadius: 8, background: "transparent", border: "1px solid transparent", color: "var(--fg-2)", opacity: 0.5, cursor: "not-allowed" }}>
         {Ico.bell({ size: 16 })}
         <span style={{ position: "absolute", top: 6, right: 6, width: 6, height: 6, borderRadius: "50%", background: "var(--danger)" }} />
       </button>

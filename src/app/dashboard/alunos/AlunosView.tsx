@@ -1,9 +1,9 @@
 "use client";
 
 /* =========================================================
-   AlunosView — tabela com filtros + drawer (client)
+   AlunosView Ã¢â‚¬â€ tabela com filtros + drawer (client)
    Recebe alunos/docentes do server (page.tsx). Labels/helpers
-   puros vêm de @/lib/data/mock (LINHAS, HOJE, mesesEntre).
+   puros vÃƒÂªm de @/lib/data/mock (LINHAS, HOJE, mesesEntre).
    ========================================================= */
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -16,7 +16,7 @@ const STATUS_MAP: Record<string, { color: string; label: string }> = {
   "Cursando": { color: "var(--info)", label: "Cursando" },
   "Qualificado": { color: "var(--ok)", label: "Qualificado" },
   "Defesa marcada": { color: "var(--accent)", label: "Defesa marcada" },
-  "Aguard. documentação": { color: "var(--warn)", label: "Aguard. doc." },
+  "Aguard. documentaÃƒÂ§ÃƒÂ£o": { color: "var(--warn)", label: "Aguard. doc." },
 };
 
 function StatusDot({ status }: { status: string }) {
@@ -86,21 +86,21 @@ function AlunosInner({ alunos, docentes }: AlunosViewProps) {
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 500, letterSpacing: "-0.02em", fontFamily: "var(--font-serif)" }}>Alunos</h1>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--muted)" }}>{rows.length} de {alunos.length} · {totalBolsas} com bolsa</p>
+          <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--muted)" }}>{rows.length} de {alunos.length} Ã‚Â· {totalBolsas} com bolsa</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn variant="ghost" size="sm" icon={Ico.download({ size: 13 })}>Exportar</Btn>
-          <Btn variant="primary" size="sm" icon={Ico.plus({ size: 13 })}>Novo aluno</Btn>
+          <Btn variant="ghost" size="sm" icon={Ico.download({ size: 13 })} disabled title="Exportacao pendente">Exportar</Btn>
+          <Btn variant="primary" size="sm" icon={Ico.plus({ size: 13 })} disabled title="Cadastro manual pendente">Novo aluno</Btn>
         </div>
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 12, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "5px 10px", minWidth: 260, flex: 1, maxWidth: 360 }}>
           {Ico.search({ size: 13, color: "var(--muted)" })}
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nome, matrícula, orientador…" style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 13, color: "var(--fg)", fontFamily: "inherit" }} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nome, matrÃƒÂ­cula, orientadorÃ¢â‚¬Â¦" style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 13, color: "var(--fg)", fontFamily: "inherit" }} />
         </div>
-        <Select value={filtroNivel} onChange={setFiltroNivel} options={["Todos", "Mestrado", "Doutorado"]} label="Nível" />
-        <Select value={filtroStatus} onChange={setFiltroStatus} options={["Todos", "Cursando", "Qualificado", "Defesa marcada", "Aguard. documentação"]} label="Status" />
+        <Select value={filtroNivel} onChange={setFiltroNivel} options={["Todos", "Mestrado", "Doutorado"]} label="NÃƒÂ­vel" />
+        <Select value={filtroStatus} onChange={setFiltroStatus} options={["Todos", "Cursando", "Qualificado", "Defesa marcada", "Aguard. documentaÃƒÂ§ÃƒÂ£o"]} label="Status" />
         <Select value={filtroBolsa} onChange={setFiltroBolsa} options={["Todas", "CAPES", "CNPq", "FAPEMIG", "PROPP", "Sem bolsa"]} label="Bolsa" />
         <div style={{ marginLeft: "auto", display: "flex", border: "1px solid var(--border)", borderRadius: 8, background: "var(--surface)", padding: 2 }}>
           {(["list", "grid"] as const).map((v) => (
@@ -115,7 +115,7 @@ function AlunosInner({ alunos, docentes }: AlunosViewProps) {
         <Card padding={0} style={{ overflow: "hidden" }}>
           <div style={{ display: "grid", gridTemplateColumns: GRID_COLS, padding: "10px 16px", borderBottom: "1px solid var(--divider)", fontSize: 11, color: "var(--muted)" }}>
             {sortHead("nome", "Aluno")}
-            {sortHead("nivel", "Nível")}
+            {sortHead("nivel", "NÃƒÂ­vel")}
             <span style={{ textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500 }}>Status</span>
             {sortHead("orientador", "Orientador")}
             <span style={{ textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500 }}>Bolsa</span>
@@ -138,7 +138,7 @@ function AlunosInner({ alunos, docentes }: AlunosViewProps) {
                   <span style={{ fontSize: 12, color: "var(--fg-2)" }}>{a.nivel}</span>
                   <StatusDot status={a.status} />
                   <span style={{ fontSize: 12, color: "var(--fg-2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.orientador}</span>
-                  <span>{a.status_bolsa !== "Nenhuma" ? <Pill tone="accent">{a.status_bolsa}</Pill> : <span style={{ fontSize: 11.5, color: "var(--muted-2)" }}>—</span>}</span>
+                  <span>{a.status_bolsa !== "Nenhuma" ? <Pill tone="accent">{a.status_bolsa}</Pill> : <span style={{ fontSize: 11.5, color: "var(--muted-2)" }}>Ã¢â‚¬â€</span>}</span>
                   <span className="mono tabular" style={{ fontSize: 12, color: prazoColor, fontWeight: 500 }}>{meses < 0 ? "vencido " + -meses + "m" : meses + "m"}</span>
                   <span style={{ color: "var(--muted)", justifySelf: "end" }}>{Ico.chevron({ size: 14 })}</span>
                 </button>
@@ -157,7 +157,7 @@ function AlunosInner({ alunos, docentes }: AlunosViewProps) {
                   <Avatar name={a.nome} hue={a.avatar_hue} size={36} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 500 }}>{a.nome}</div>
-                    <div className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>{a.matricula} · {a.nivel}</div>
+                    <div className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>{a.matricula} Ã‚Â· {a.nivel}</div>
                   </div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, fontSize: 12 }}>
@@ -213,7 +213,7 @@ function AlunoDrawer({ aluno, docentes, onClose }: { aluno: Aluno; docentes: Doc
       <div onClick={(e) => e.stopPropagation()} className="nice-scroll" style={{ width: 520, maxWidth: "100vw", background: "var(--surface)", borderLeft: "1px solid var(--border)", height: "100vh", overflowY: "auto", animation: "slide-in-right var(--t-mid)" }}>
         <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid var(--divider)", position: "sticky", top: 0, background: "var(--surface)", zIndex: 1 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
-            <span style={{ fontSize: 11, color: "var(--muted)", letterSpacing: "0.05em", textTransform: "uppercase" }}>{aluno.nivel}{aluno.linha >= 0 ? ` · ${linhaLabel(aluno.linha)}` : ""}</span>
+            <span style={{ fontSize: 11, color: "var(--muted)", letterSpacing: "0.05em", textTransform: "uppercase" }}>{aluno.nivel}{aluno.linha >= 0 ? ` Ã‚Â· ${linhaLabel(aluno.linha)}` : ""}</span>
             <button onClick={onClose} style={{ background: "transparent", border: "none", color: "var(--muted)", padding: 2 }}>{Ico.close({ size: 16 })}</button>
           </div>
           <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
@@ -224,9 +224,9 @@ function AlunoDrawer({ aluno, docentes, onClose }: { aluno: Aluno; docentes: Doc
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <Btn variant="primary" size="sm" icon={Ico.mail({ size: 12 })}>Enviar e-mail</Btn>
-            <Btn variant="secondary" size="sm" icon={Ico.file({ size: 12 })}>Histórico</Btn>
-            <Btn variant="secondary" size="sm">Editar</Btn>
+            <Btn variant="primary" size="sm" icon={Ico.mail({ size: 12 })} disabled title="Envio por SMTP removido do escopo">Enviar e-mail</Btn>
+            <Btn variant="secondary" size="sm" icon={Ico.file({ size: 12 })} disabled title="Historico editavel pendente">HistÃƒÂ³rico</Btn>
+            <Btn variant="secondary" size="sm" disabled title="Edicao pendente">Editar</Btn>
           </div>
         </div>
 
@@ -235,15 +235,15 @@ function AlunoDrawer({ aluno, docentes, onClose }: { aluno: Aluno; docentes: Doc
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
               <span style={{ fontSize: 12, color: "var(--muted)" }}>Prazo de jubilamento</span>
               <span className="mono tabular" style={{ fontSize: 12, color: meses < 0 ? "var(--danger)" : meses < 6 ? "var(--warn)" : "var(--fg-2)", fontWeight: 500 }}>
-                {meses < 0 ? "Vencido há " + -meses + " meses" : meses + " meses restantes"}
+                {meses < 0 ? "Vencido hÃƒÂ¡ " + -meses + " meses" : meses + " meses restantes"}
               </span>
             </div>
             <div style={{ height: 6, background: "var(--inset)", borderRadius: 100, overflow: "hidden" }}>
               <div style={{ width: pct + "%", height: "100%", background: meses < 0 ? "var(--danger)" : pct > 80 ? "var(--warn)" : "var(--accent)", borderRadius: 100 }} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 10.5, color: "var(--muted-2)", fontFamily: "var(--font-mono)" }}>
-              <span>Ingresso · {aluno.ingresso ? new Date(aluno.ingresso).toLocaleDateString("pt-BR") : "—"}</span>
-              <span>Limite · {aluno.prazo_jubilamento ? new Date(aluno.prazo_jubilamento).toLocaleDateString("pt-BR") : "—"}</span>
+              <span>Ingresso Ã‚Â· {aluno.ingresso ? new Date(aluno.ingresso).toLocaleDateString("pt-BR") : "Ã¢â‚¬â€"}</span>
+              <span>Limite Ã‚Â· {aluno.prazo_jubilamento ? new Date(aluno.prazo_jubilamento).toLocaleDateString("pt-BR") : "Ã¢â‚¬â€"}</span>
             </div>
           </div>
 
@@ -252,19 +252,19 @@ function AlunoDrawer({ aluno, docentes, onClose }: { aluno: Aluno; docentes: Doc
             <Info label="Bolsa" value={aluno.status_bolsa !== "Nenhuma" ? <Pill tone="accent">{aluno.status_bolsa}</Pill> : <span style={{ color: "var(--muted)" }}>Sem bolsa</span>} />
             <Info label="Orientador" value={<span style={{ fontWeight: 500 }}>{aluno.orientador}</span>} />
             <Info label="Linha de pesquisa" value={linhaLabel(aluno.linha)} />
-            <Info label="Créditos cursados" value={<span className="mono">{aluno.creditos}/96</span>} />
-            <Info label="Produções vinculadas" value={<span className="mono">{aluno.producoes}</span>} />
+            <Info label="CrÃƒÂ©ditos cursados" value={<span className="mono">{aluno.creditos}/96</span>} />
+            <Info label="ProduÃƒÂ§ÃƒÂµes vinculadas" value={<span className="mono">{aluno.producoes}</span>} />
           </div>
 
           <div>
-            <h3 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 600 }}>Histórico</h3>
+            <h3 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 600 }}>HistÃƒÂ³rico</h3>
             <div style={{ position: "relative", paddingLeft: 20 }}>
               <div style={{ position: "absolute", left: 7, top: 4, bottom: 4, width: 1, background: "var(--divider)" }} />
               {[
-                { d: "14 Mai 2026", t: "Matrícula confirmada · 2026/1", n: "Sistema SRA" },
-                { d: "02 Mar 2026", t: "Qualificação aprovada", n: "Banca: " + (orient?.nome || "—") + " (orient.)" },
-                { d: "12 Out 2025", t: "Produção registrada · QUALIS A2", n: '"Edge replication strategies…"' },
-                { d: "01 Ago 2024", t: "Início do programa", n: "Ingresso via processo seletivo 2024/2" },
+                { d: "14 Mai 2026", t: "MatrÃƒÂ­cula confirmada Ã‚Â· 2026/1", n: "Sistema SRA" },
+                { d: "02 Mar 2026", t: "QualificaÃƒÂ§ÃƒÂ£o aprovada", n: "Banca: " + (orient?.nome || "Ã¢â‚¬â€") + " (orient.)" },
+                { d: "12 Out 2025", t: "ProduÃƒÂ§ÃƒÂ£o registrada Ã‚Â· QUALIS A2", n: '"Edge replication strategiesÃ¢â‚¬Â¦"' },
+                { d: "01 Ago 2024", t: "InÃƒÂ­cio do programa", n: "Ingresso via processo seletivo 2024/2" },
               ].map((h, i) => (
                 <div key={i} style={{ position: "relative", paddingBottom: 14 }}>
                   <span style={{ position: "absolute", left: -19, top: 4, width: 10, height: 10, borderRadius: "50%", background: i === 0 ? "var(--accent)" : "var(--surface)", border: "1.5px solid var(--border-strong)" }} />
@@ -283,7 +283,7 @@ function AlunoDrawer({ aluno, docentes, onClose }: { aluno: Aluno; docentes: Doc
 
 export function AlunosView({ alunos, docentes }: AlunosViewProps) {
   return (
-    <Suspense fallback={<div style={{ padding: 40, color: "var(--muted)" }}>Carregando…</div>}>
+    <Suspense fallback={<div style={{ padding: 40, color: "var(--muted)" }}>CarregandoÃ¢â‚¬Â¦</div>}>
       <AlunosInner alunos={alunos} docentes={docentes} />
     </Suspense>
   );

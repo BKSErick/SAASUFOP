@@ -1,12 +1,9 @@
--- Rodar UMA VEZ no SQL Editor do Supabase após habilitar pg_cron e pg_net.
--- Substitua os valores abaixo com os dados reais do seu projeto.
--- Project URL e Service Role Key: Dashboard → Settings → API
+-- Keepalive Supabase
+-- Sem SMTP, sem service role, sem pg_net.
+-- Rode a migration 20260508000001_add_cron_jubilamento.sql para agendar
+-- apenas um SELECT diario via pg_cron, com objetivo de evitar pausa do projeto.
 
-ALTER DATABASE postgres
-    SET "app.settings.supabase_url" = 'https://pmlvqbnypixmccjdttjw.supabase.co';
-
-ALTER DATABASE postgres
-    SET "app.settings.service_role_key" = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtbHZxYm55cGl4bWNjamR0dGp3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjUyNDE1MCwiZXhwIjoyMDkyMTAwMTUwfQ.bmg3AKH7EIsssmOJlmRbx7YMmhtrb6JhasDlOny02AU';
-
--- Após rodar o ALTER DATABASE, rode a migration normalmente:
--- supabase db push  (ou cole o conteúdo de 20260508000001_add_cron_jubilamento.sql)
+-- Verificar job ativo:
+SELECT jobid, jobname, schedule, command, active
+FROM cron.job
+WHERE jobname = 'ufop-keepalive-diario';

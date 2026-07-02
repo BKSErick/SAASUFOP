@@ -1,5 +1,5 @@
 /* =========================================================
-   UI primitives — Card, Pill, Avatar, Btn, Section
+   UI primitives Ã¢â‚¬â€ Card, Pill, Avatar, Btn, Section
    Port tipado de _prototype/shell.jsx (inline-style + CSS vars)
    ========================================================= */
 import type { CSSProperties, ReactNode } from "react";
@@ -166,6 +166,7 @@ export function Btn({
         fontFamily: "inherit",
         transition: "background var(--t-fast), opacity var(--t-fast)",
         opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? "not-allowed" : onClick ? "pointer" : "default",
         ...sz,
         ...style,
       }}

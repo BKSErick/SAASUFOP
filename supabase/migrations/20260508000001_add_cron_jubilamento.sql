@@ -1,29 +1,23 @@
--- Migration: pg_cron para check-jubilamento diário
+-- Migration: pg_cron keepalive para evitar pausa do projeto Supabase.
+-- Nao executa regras de negocio, nao envia e-mail e nao chama Edge Functions.
 
--- Habilita as extensões necessárias
 CREATE EXTENSION IF NOT EXISTS pg_cron;
-CREATE EXTENSION IF NOT EXISTS pg_net;
 
--- Remove job anterior se existir
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'check-jubilamento-diario') THEN
         PERFORM cron.unschedule('check-jubilamento-diario');
     END IF;
+
+    IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'ufop-keepalive-diario') THEN
+        PERFORM cron.unschedule('ufop-keepalive-diario');
+    END IF;
 END $$;
 
--- Agenda: todo dia às 10:00 UTC (07:00 BRT)
 SELECT cron.schedule(
-    'check-jubilamento-diario',
+    'ufop-keepalive-diario',
     '0 10 * * *',
     $$
-    SELECT net.http_post(
-        url := 'https://pmlvqbnypixmccjdttjw.supabase.co/functions/v1/check-jubilamento',
-        headers := jsonb_build_object(
-            'Content-Type', 'application/json',
-            'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtbHZxYm55cGl4bWNjamR0dGp3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjUyNDE1MCwiZXhwIjoyMDkyMTAwMTUwfQ.bmg3AKH7EIsssmOJlmRbx7YMmhtrb6JhasDlOny02AU'
-        ),
-        body := '{}'::jsonb
-    );
+    SELECT now() AS keepalive_at;
     $$
 );

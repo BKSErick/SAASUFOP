@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { ADMIN_ROLES, requireApiAuth } from '@/lib/api-auth'
 import { getSpreadsheetData } from '@/lib/google-sheets'
 import { logError } from '@/lib/logger'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
@@ -18,9 +19,9 @@ const ALUNOS_MAPPING: SheetMapping[] = [
 
 const FIELD_KEYWORDS: Record<string, string[]> = {
     nome:           ['NOME', 'NAME', 'ALUNO', 'DISCENTE'],
-    matricula:      ['MATRÍCULA', 'MATRICULA', 'MAT', 'REGISTRO'],
+    matricula:      ['MATRICULA', 'MAT', 'REGISTRO'],
     email:          ['EMAIL', 'E-MAIL'],
-    data_ingresso:  ['DATA INGRESSO', 'INGRESSO', 'ENTRADA', 'INÍCIO', 'INICIO'],
+    data_ingresso:  ['DATA INGRESSO', 'INGRESSO', 'ENTRADA', 'INICIO'],
 }
 
 function findHeader(headers: string[], keywords: string[]): number {
@@ -40,12 +41,15 @@ function parseDate(val: string): string | null {
 }
 
 export async function POST(request: Request) {
+    const auth = await requireApiAuth(request, { roles: ADMIN_ROLES })
+    if (!auth.ok) return auth.response
+
     try {
         const body = await request.json()
         const { spreadsheetId, range = process.env.GOOGLE_SHEETS_RANGE ?? 'A1:Z500' } = body
 
         if (!spreadsheetId) {
-            return NextResponse.json({ error: 'spreadsheetId é obrigatório' }, { status: 400 })
+            return NextResponse.json({ error: 'spreadsheetId obrigatorio' }, { status: 400 })
         }
 
         const rawData = await getSpreadsheetData(spreadsheetId, range)
@@ -56,7 +60,6 @@ export async function POST(request: Request) {
         const [headerRow, ...dataRows] = rawData
         const headers = headerRow.map(h => String(h).trim())
 
-        // Resolve column indexes via fuzzy header matching
         const colIdx: Record<string, number> = {}
         const mappingErrors: string[] = []
         for (const mapping of ALUNOS_MAPPING) {
@@ -64,7 +67,7 @@ export async function POST(request: Request) {
             const idx = findHeader(headers, keywords)
             if (idx === -1 && mapping.required) {
                 mappingErrors.push(
-                    `Coluna obrigatória não encontrada: "${mapping.sheetColumn}" (tentativas: ${keywords.join(', ')})`
+                    `Coluna obrigatoria nao encontrada: "${mapping.sheetColumn}" (tentativas: ${keywords.join(', ')})`
                 )
             }
             colIdx[mapping.supabaseField] = idx
@@ -74,7 +77,6 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Erro de mapeamento de colunas', details: mappingErrors }, { status: 422 })
         }
 
-        // Map rows to alunos records
         const rowErrors: { linha: number; mensagem: string }[] = []
         const valid: { nome: string; matricula: string; email: string | null; data_ingresso: string | null }[] = []
 
@@ -85,7 +87,7 @@ export async function POST(request: Request) {
 
             if (!nome || !matricula) {
                 if (row.some(c => c)) {
-                    rowErrors.push({ linha: linhaPlanilha, mensagem: 'Nome ou matrícula ausente' })
+                    rowErrors.push({ linha: linhaPlanilha, mensagem: 'Nome ou matricula ausente' })
                 }
                 return
             }
@@ -106,7 +108,6 @@ export async function POST(request: Request) {
             return NextResponse.json({ read: dataRows.length, inserted: 0, updated: 0, errors: rowErrors })
         }
 
-        // Pre-check existing to differentiate inserted vs updated
         const matriculas = valid.map(r => r.matricula)
         const { data: existing } = await supabase
             .from('alunos')

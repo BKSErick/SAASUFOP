@@ -1,10 +1,14 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
+import { ADMIN_ROLES, requireApiAuth } from '@/lib/api-auth'
 import { parseJCRcsv, importJournalList, runCrosswalk } from '@/lib/jcr-crosswalk'
 
 // POST /api/jcr-crosswalk
-// Body: { action: 'run' }                       → só executa o crosswalk
-// Body: { action: 'import', csv: '<csv text>' } → importa CSV e executa crosswalk
+// Body: { action: 'run' }                       â†’ sÃ³ executa o crosswalk
+// Body: { action: 'import', csv: '<csv text>' } â†’ importa CSV e executa crosswalk
 export async function POST(req: Request) {
+    const auth = await requireApiAuth(req, { roles: ADMIN_ROLES })
+    if (!auth.ok) return auth.response
+
     try {
         const body = await req.json()
         const { action, csv } = body as { action: 'run' | 'import'; csv?: string }
@@ -13,11 +17,11 @@ export async function POST(req: Request) {
 
         if (action === 'import') {
             if (!csv || typeof csv !== 'string') {
-                return NextResponse.json({ error: 'Campo csv é obrigatório para action=import' }, { status: 400 })
+                return NextResponse.json({ error: 'Campo csv Ã© obrigatÃ³rio para action=import' }, { status: 400 })
             }
             const journals = parseJCRcsv(csv)
             if (journals.length === 0) {
-                return NextResponse.json({ error: 'Nenhum journal válido encontrado no CSV' }, { status: 422 })
+                return NextResponse.json({ error: 'Nenhum journal vÃ¡lido encontrado no CSV' }, { status: 422 })
             }
             importResult = await importJournalList(journals)
         }
@@ -33,8 +37,11 @@ export async function POST(req: Request) {
     }
 }
 
-// GET /api/jcr-crosswalk → retorna stats atuais
-export async function GET() {
+// GET /api/jcr-crosswalk â†’ retorna stats atuais
+export async function GET(request: Request) {
+    const auth = await requireApiAuth(request, { roles: ADMIN_ROLES })
+    if (!auth.ok) return auth.response
+
     try {
         const crosswalk = await runCrosswalk()
         return NextResponse.json({ crosswalk })
