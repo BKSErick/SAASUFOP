@@ -6,6 +6,7 @@
    puros vÃƒÂªm de @/lib/data/mock (LINHAS, HOJE, mesesEntre).
    ========================================================= */
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, Pill, Avatar, Btn } from "@/components/ui/primitives";
 import { Ico } from "@/components/icons";
@@ -208,8 +209,11 @@ function AlunoDrawer({ aluno, docentes, onClose }: { aluno: Aluno; docentes: Doc
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "color-mix(in oklch, var(--bg) 40%, transparent)", backdropFilter: "blur(4px)", zIndex: 50, display: "flex", justifyContent: "flex-end" }}>
+  const portalTarget = typeof document === "undefined" ? null : document.body;
+  if (!portalTarget) return null;
+
+  return createPortal(
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "color-mix(in oklch, var(--bg) 40%, transparent)", backdropFilter: "blur(4px)", zIndex: 120, display: "flex", justifyContent: "flex-end" }}>
       <div onClick={(e) => e.stopPropagation()} className="nice-scroll" style={{ width: 520, maxWidth: "100vw", background: "var(--surface)", borderLeft: "1px solid var(--border)", height: "100vh", overflowY: "auto", animation: "slide-in-right var(--t-mid)" }}>
         <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid var(--divider)", position: "sticky", top: 0, background: "var(--surface)", zIndex: 1 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
@@ -277,7 +281,8 @@ function AlunoDrawer({ aluno, docentes, onClose }: { aluno: Aluno; docentes: Doc
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    portalTarget,
   );
 }
 
