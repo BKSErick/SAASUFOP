@@ -69,6 +69,23 @@ interface ProducaoRow {
   professores: { nome: string } | null;
 }
 
+interface QualityProducaoRow {
+  id: string;
+  qualis: string | null;
+  jcr_quartile: string | null;
+  link_scopus: string | null;
+  doi: string | null;
+  journal: string | null;
+}
+
+interface QualityDocenteRow {
+  id: string;
+  kpi_h: number | null;
+  kpi_fwci: number | null;
+  producao_count: number | null;
+  lattes_updated_at: string | null;
+}
+
 interface BancaRow {
   id: string;
   titulo_trabalho: string;
@@ -135,7 +152,7 @@ function mapProducao(r: ProducaoRow): Producao {
     id: r.id,
     titulo: r.titulo,
     venue: r.journal ?? "",
-    qualis: (r.qualis ?? "B1") as Qualis,
+    qualis: (r.qualis ?? "") as Qualis,
     ano: r.data_publicacao ? new Date(r.data_publicacao).getFullYear() : 0,
     autores: r.professores?.nome ? [r.professores.nome] : [],
   };
@@ -243,6 +260,72 @@ export async function getDisciplinas(): Promise<Disciplina[]> {
  */
 export async function getProdSeries(): Promise<ProdSeriesPoint[]> {
   return PROD_SERIES;
+}
+
+export interface QualityCapesMetrics {
+  totalProducoes: number;
+  producaoA1A2: number;
+  producaoQualificada: number;
+  semQualis: number;
+  qualisCounts: Record<string, number>;
+  jcrCounts: Record<string, number>;
+  scopusLinks: number;
+  docentesComHIndex: number;
+  docentesComFwci: number;
+  mediaHIndex: number;
+  mediaFwci: number;
+  docentesAtualizados: number;
+  totalDocentes: number;
+}
+
+function average(values: number[]) {
+  if (values.length === 0) return 0;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+export async function getQualityCapesMetrics(): Promise<QualityCapesMetrics> {
+  const supabase = await createSupabaseServer();
+  const [{ data: producoes, error: producoesError }, { data: docentes, error: docentesError }] = await Promise.all([
+    supabase
+      .from("producoes")
+      .select("id, qualis, jcr_quartile, link_scopus, doi, journal")
+      .returns<QualityProducaoRow[]>(),
+    supabase
+      .from("professores")
+      .select("id, kpi_h, kpi_fwci, producao_count, lattes_updated_at")
+      .returns<QualityDocenteRow[]>(),
+  ]);
+
+  if (producoesError) throw new Error(`getQualityCapesMetrics producoes failed: ${producoesError.message}`);
+  if (docentesError) throw new Error(`getQualityCapesMetrics docentes failed: ${docentesError.message}`);
+
+  const qualisCounts: Record<string, number> = {};
+  const jcrCounts: Record<string, number> = {};
+  const qualifiedQualis = new Set(["A1", "A2", "A3", "A4", "B1"]);
+
+  for (const producao of producoes ?? []) {
+    if (producao.qualis) qualisCounts[producao.qualis] = (qualisCounts[producao.qualis] ?? 0) + 1;
+    if (producao.jcr_quartile) jcrCounts[producao.jcr_quartile] = (jcrCounts[producao.jcr_quartile] ?? 0) + 1;
+  }
+
+  const hValues = (docentes ?? []).map((docente) => Number(docente.kpi_h ?? 0)).filter((value) => value > 0);
+  const fwciValues = (docentes ?? []).map((docente) => Number(docente.kpi_fwci ?? 0)).filter((value) => value > 0);
+
+  return {
+    totalProducoes: producoes?.length ?? 0,
+    producaoA1A2: (producoes ?? []).filter((producao) => producao.qualis === "A1" || producao.qualis === "A2").length,
+    producaoQualificada: (producoes ?? []).filter((producao) => qualifiedQualis.has(producao.qualis ?? "")).length,
+    semQualis: (producoes ?? []).filter((producao) => !producao.qualis).length,
+    qualisCounts,
+    jcrCounts,
+    scopusLinks: (producoes ?? []).filter((producao) => Boolean(producao.link_scopus || producao.doi)).length,
+    docentesComHIndex: hValues.length,
+    docentesComFwci: fwciValues.length,
+    mediaHIndex: average(hValues),
+    mediaFwci: average(fwciValues),
+    docentesAtualizados: (docentes ?? []).filter((docente) => Boolean(docente.lattes_updated_at)).length,
+    totalDocentes: docentes?.length ?? 0,
+  };
 }
 
 // ----- KPIs derivados (dos dados reais) -----

@@ -15,7 +15,7 @@ export type StatusAluno =
 
 export type CapesRating = "1A" | "1B" | "2";
 
-export type Qualis = "A1" | "A2" | "B1" | "B2";
+export type Qualis = "" | "A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "C";
 
 export type TipoBanca = "Defesa" | "Qualificação";
 

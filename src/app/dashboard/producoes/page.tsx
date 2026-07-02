@@ -36,7 +36,7 @@ export default async function ProducoesPage() {
         )}
         {producoes.map((p, i) => (
           <div key={p.id} style={{ display: "grid", gridTemplateColumns: COLS, gap: 14, padding: "16px 20px", borderBottom: i < producoes.length - 1 ? "1px solid var(--divider)" : "none", alignItems: "center" }}>
-            <Pill tone={p.qualis === "A1" ? "accent" : p.qualis === "A2" ? "info" : "neutral"}>{p.qualis}</Pill>
+            <Pill tone={p.qualis === "A1" ? "accent" : p.qualis === "A2" ? "info" : "neutral"}>{p.qualis || "Sem QUALIS"}</Pill>
             <div>
               <div style={{ fontSize: 13.5, fontWeight: 500, lineHeight: 1.35 }}>{p.titulo}</div>
               <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 3 }}>{p.autores.join(", ")}</div>
