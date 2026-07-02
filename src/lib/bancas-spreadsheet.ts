@@ -25,6 +25,10 @@ function clean(value: unknown) {
 
 function getValue(row: Record<string, unknown>, aliases: string[]) {
   const keys = Object.keys(row).map((key) => ({ key, normalized: normalize(key) }));
+  const normalizedAliases = aliases.map(normalize);
+  const exact = keys.find(({ normalized }) => normalizedAliases.includes(normalized));
+  if (exact) return row[exact.key];
+
   const match = keys.find(({ normalized }) =>
     aliases.some((alias) => normalized.includes(normalize(alias))),
   );
@@ -64,18 +68,23 @@ export function parseBancasSpreadsheet(buffer: Buffer): BancaImportRow[] {
 
   return rows
     .map((row) => {
-      const titulo = clean(getValue(row, ["titulo", "título", "trabalho", "dissertacao", "dissertação", "tese"]));
-      const data = parseDate(getValue(row, ["data hora", "data_hora", "data", "defesa", "agendamento"]));
+      const alunoNome = clean(getValue(row, ["aluno", "discente", "nome do aluno", "nome"]));
+      const matricula = clean(getValue(row, ["matricula", "registro"]));
+      const data = parseDate(getValue(row, ["data defesa", "data de defesa", "data hora", "data_hora", "data", "defesa", "agendamento"]));
+      const titulo =
+        clean(getValue(row, ["titulo", "trabalho", "dissertacao", "tese"])) ??
+        (alunoNome ? `Defesa - ${alunoNome}` : null);
+
       if (!titulo || !data) return null;
 
       const parsed: BancaImportRow = {
-        aluno_nome: clean(getValue(row, ["aluno", "discente", "nome do aluno"])),
-        matricula: clean(getValue(row, ["matricula", "matrícula", "registro"])),
+        aluno_nome: alunoNome,
+        matricula,
         titulo_trabalho: titulo,
         tipo: normalizeTipo(getValue(row, ["tipo", "banca", "evento"])),
         data_hora: data,
         local: clean(getValue(row, ["local", "sala", "link sala"])),
-        link_transmissao: clean(getValue(row, ["link", "transmissao", "transmissão", "meet", "teams"])),
+        link_transmissao: clean(getValue(row, ["link", "transmissao", "meet", "teams"])),
       };
 
       return parsed;
